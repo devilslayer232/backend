@@ -13,7 +13,7 @@ const ubicacionesTransportistaRouter = require('./funcionamiento/ubicacionesTran
 
 const app = express();
 
-// Configuración CORS - Allow all origins for now to debug
+// test Configuración CORS - Allow all origins for now to debug
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
