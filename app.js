@@ -13,56 +13,11 @@ const ubicacionesTransportistaRouter = require('./funcionamiento/ubicacionesTran
 
 const app = express();
 
-// Configuración CORS
-const corsOptions = {
-            origin: [
-                'http://localhost:5173',
-                'http://localhost:5175',
-                'http://localhost:3000',
-                'http://localhost:8080',
-                'http://127.0.0.1:5173',
-                'http://127.0.0.1:5175',
-                'http://127.0.0.1:3000',
-                'http://127.0.0.1:8080',
-                'http://192.168.1.21:5173',
-                'capacitor://localhost',
-                /^capacitor:\/\/localhost(\/.*)?$/,
-                'https://proyectodetitulo-3f8ce.web.app',
-                'https://backend-production-46b4a.up.railway.app' // Add Railway domain
-            ],
-            credentials: true,
-            optionsSuccessStatus: 200,
-            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-            allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-        };
-
-// Aplicar CORS con las opciones
-app.use(cors(corsOptions));
-
-// Additional CORS headers for preflight requests
+// Configuración CORS - Allow all origins for now to debug
 app.use((req, res, next) => {
-    const allowedOrigins = [
-        'http://localhost:5173',
-        'http://localhost:5175',
-        'http://localhost:3000',
-        'http://localhost:8080',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:5175',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:8080',
-        'http://192.168.1.21:5173',
-        'capacitor://localhost',
-        'https://proyectodetitulo-3f8ce.web.app',
-        'https://backend-production-46b4a.up.railway.app'
-    ];
-
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin) || allowedOrigins.some(o => typeof o === 'object' && o.test && o.test(origin))) {
-        res.header('Access-Control-Allow-Origin', origin);
-    }
-
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
 
     if (req.method === 'OPTIONS') {
