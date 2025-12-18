@@ -5,40 +5,27 @@ const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true, 
-  connectionLimit: 10,     
-  queueLimit: 0            
+  database: process.env.DB_NAME
 };
 
-if (!dbConfig.host || !dbConfig.user || !dbConfig.password || !dbConfig.database) {
-  console.error("❌ ERROR CRÍTICO: Faltan una o más variables de entorno para la conexión a la base de datos.");
-  console.error("Asegúrate de que DB_HOST, DB_USER, DB_PASSWORD, DB_NAME estén configuradas en Railway.");
-  process.exit(1);
-}
 
-const pool = mysql.createPool(dbConfig); // <--- ¡USAMOS pool!
+
+
 
 // Crear conexión
 const db = mysql.createConnection(dbConfig);
 
 // Conectar a la base de datos
-async function initializeDatabase() {
-    try {
-        // Intenta obtener una conexión del pool para verificar que funciona
-        const connection = await pool.getConnection();
-        console.log("Conectado a MySQL a través del pool!");
-        connection.release(); // Libera la conexión de vuelta al pool
-
-        // Ahora, inicializa las tablas
-        await inicializarTablas(); 
-        console.log("✅ Todas las tablas han sido inicializadas correctamente");
-
-    } catch (err) {
-        console.error("❌ Error al inicializar la base de datos:", err.message);
-        throw err; // Propaga el error para que `app.js` pueda atraparlo
-    }
-}
+db.connect((err) => {
+  if (err) {
+    console.error("Error de conexión a MySQL:", err);
+  } else {
+    console.log("Conectado a MySQL!");
+    console.log(`Base de datos: ${dbConfig.database}`);
+    // Inicializar tablas automáticamente
+    inicializarTablas();
+  }
+});
 
 // Función para inicializar todas las tablas necesarias
 async function inicializarTablas() {
@@ -197,14 +184,16 @@ async function inicializarTablas() {
 }
 
 // Función helper para ejecutar queries
-async function ejecutarQuery(sql, params = []) {
-  const connection = await pool.getConnection(); // Obtiene una conexión del pool
-  try {
-    const [results] = await connection.execute(sql, params); // Usa .execute con Promesas
-    return results;
-  } finally {
-    connection.release(); // SIEMPRE libera la conexión de vuelta al pool
-  }
+function ejecutarQuery(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.query(sql, params, (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results);
+      }
+    });
+  });
 }
 
 // Función para crear tablas dinámicamente basadas en componentes
@@ -233,8 +222,8 @@ async function crearTablaDesdeComponente(nombreComponente, campos) {
 }
 
 module.exports = {
-  db: pool, // <--- Exporta el pool en lugar de la conexión simple para otros módulos
+  db,
   ejecutarQuery,
   crearTablaDesdeComponente,
-  initializeDatabase // <--- ¡EXPORTA LA FUNCIÓN DE INICIALIZACIÓN!
+  inicializarTablas
 };

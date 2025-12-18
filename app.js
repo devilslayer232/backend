@@ -6,11 +6,10 @@ const clientes = require('./funcionamiento/clientes');
 const registroFacialRouter = require('./funcionamiento/RegistroFacial');
 const loginRouter = require('./funcionamiento/login');
 const detallespedidos = require('./funcionamiento/detallespedidos');
-const faceVerificacionRouter = require('./funcionamiento/FaceVerificacion'); 
-const uploadFotoRouter = require('./funcionamiento/uploadFoto'); 
-const transportistasRouter = require('./funcionamiento/transportistas'); 
-const ubicacionesTransportistaRouter = require('./funcionamiento/ubicacionesTransportista');
-const { initializeDatabase } = require('./config/database'); 
+const faceVerificacionRouter = require('./funcionamiento/FaceVerificacion'); // ✅ NUEVO
+const uploadFotoRouter = require('./funcionamiento/uploadFoto'); // ✅ NUEVO
+const transportistasRouter = require('./funcionamiento/transportistas'); // ✅ NUEVO
+const ubicacionesTransportistaRouter = require('./funcionamiento/ubicacionesTransportista'); // ✅ NUEVO
 
 const app = express();
 
@@ -45,19 +44,7 @@ app.use('/api/ubicaciones-transportista', ubicacionesTransportistaRouter); // �
 
 
 
-async function startApplication() {
-    try {
-        await initializeDatabase(); // Espera a que la DB se conecte y las tablas se inicien
-
-        const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 4000; // Railway usará el PORT que asigne, si no, usa 4000
         app.listen(PORT, '0.0.0.0', () => {
-            console.log(`Servidor backend escuchando en el puerto ${PORT}`);
+            console.log(`Servidor backend corriendo en el puerto ${PORT}`);
         });
-
-    } catch (error) {
-        console.error("❌ ERROR CRÍTICO al iniciar la aplicación:", error);
-        process.exit(1); // Salir si la DB o el servidor fallan al iniciar
-    }
-}
-
-startApplication();
