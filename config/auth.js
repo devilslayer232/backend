@@ -7,8 +7,14 @@ const verificarToken = (req, res, next) => {
     return res.status(401).json({ error: "Token de acceso requerido" });
   }
 
+  if (!process.env.JWT_SECRET) {
+      console.error("❌ ERROR CRÍTICO: JWT_SECRET no está configurado en las variables de entorno.");
+      return res.status(500).json({ error: "Error interno del servidor: configuración de seguridad faltante." });
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "mi_secreto_super_seguro");
+    // Usamos directamente process.env.JWT_SECRET. ¡No hay fallback hardcodeado!
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); 
     req.usuario = decoded;
     next();
   } catch (error) {
@@ -17,6 +23,7 @@ const verificarToken = (req, res, next) => {
 };
 
 const verificarRol = (roles) => {
+  // ... (tu código para verificarRol, no necesita cambios directos relacionados con process.env aquí) ...
   return (req, res, next) => {
     if (!req.usuario) {
       return res.status(401).json({ error: "Usuario no autenticado" });
@@ -34,5 +41,3 @@ module.exports = {
   verificarToken,
   verificarRol
 };
-
-
