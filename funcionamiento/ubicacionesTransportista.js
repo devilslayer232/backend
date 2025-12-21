@@ -97,4 +97,75 @@ router.get("/recientes", async (req, res) => {
   }
 });
 
+// GET - Obtener ubicaciones de transportistas asignados a pedidos del usuario
+router.get("/asignados", async (req, res) => {
+  try {
+    // Obtener usuario del token JWT
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ error: "Token no proporcionado" });
+    }
+
+    const jwt = require("jsonwebtoken");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "mi_secreto_super_seguro");
+    const usuario = decoded;
+
+    let transportistaIds = [];
+
+    if (usuario.rol === 'admin') {
+      // Admin ve todas las ubicaciones recientes
+      const sql = `
+        SELECT DISTINCT ut.transportista_id
+        FROM ubicaciones_transportista ut
+        ORDER BY ut.timestamp DESC
+      `;
+      const transportistas = await ejecutarQuery(sql);
+      transportistaIds = transportistas.map(t => t.transportista_id);
+    } else if (usuario.rol === 'cliente') {
+      // Cliente ve ubicaciones de transportistas asignados a sus pedidos
+      const sql = `
+        SELECT DISTINCT c.transportista_id
+        FROM clientes c
+        WHERE c.transportista_id IS NOT NULL
+        AND c.usuario_id = ?
+      `;
+      const transportistas = await ejecutarQuery(sql, [usuario.id]);
+      transportistaIds = transportistas.map(t => t.transportista_id).filter(id => id !== null);
+    } else {
+      return res.status(403).json({ error: "Rol no autorizado para ver ubicaciones" });
+    }
+
+    if (transportistaIds.length === 0) {
+      return res.json([]);
+    }
+
+    // Obtener últimas ubicaciones de los transportistas filtrados
+    const placeholders = transportistaIds.map(() => '?').join(',');
+    const sql = `
+      SELECT ut.*, t.email as transportista_email
+      FROM ubicaciones_transportista ut
+      JOIN transportistas t ON ut.transportista_id = t.id
+      WHERE ut.transportista_id IN (${placeholders})
+      AND ut.timestamp >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+      ORDER BY ut.transportista_id, ut.timestamp DESC
+    `;
+
+    const allLocations = await ejecutarQuery(sql, transportistaIds);
+
+    // Obtener solo la ubicación más reciente por transportista
+    const latestLocations = {};
+    allLocations.forEach(location => {
+      if (!latestLocations[location.transportista_id]) {
+        latestLocations[location.transportista_id] = location;
+      }
+    });
+
+    const results = Object.values(latestLocations);
+    res.json(results);
+  } catch (error) {
+    console.error("Error obteniendo ubicaciones asignadas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
 module.exports = router;
