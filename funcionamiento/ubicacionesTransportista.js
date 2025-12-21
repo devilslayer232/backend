@@ -82,9 +82,9 @@ router.get("/recientes", async (req, res) => {
     const { limite = 100 } = req.query;
 
     const sql = `
-      SELECT ut.*, t.email as transportista_email
+      SELECT ut.*, u.email as transportista_email
       FROM ubicaciones_transportista ut
-      JOIN transportistas t ON ut.transportista_id = t.id
+      JOIN usuarios u ON ut.transportista_id = u.id
       ORDER BY ut.timestamp DESC
       LIMIT ?
     `;
@@ -107,7 +107,7 @@ router.get("/asignados", async (req, res) => {
     }
 
     const jwt = require("jsonwebtoken");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "732ac7f71614373114b24f6412a69e1e466e6bb82002c48e95ff93e39dbb4c3b");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET );
     const usuario = decoded;
 
     let transportistaIds = [];
@@ -145,9 +145,9 @@ router.get("/asignados", async (req, res) => {
     // Obtener últimas ubicaciones de los transportistas filtrados
     const placeholders = transportistaIds.map(() => '?').join(',');
     const sql = `
-      SELECT ut.*, t.email as transportista_email
+      SELECT ut.*, u.email as transportista_email
       FROM ubicaciones_transportista ut
-      JOIN transportistas t ON ut.transportista_id = t.id
+      JOIN usuarios u ON ut.transportista_id = u.id
       WHERE ut.transportista_id IN (${placeholders})
       AND ut.timestamp >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
       ORDER BY ut.transportista_id, ut.timestamp DESC

@@ -38,8 +38,8 @@ router.post("/", (req, res) => {
           email: usuario.email,
           rol: usuario.rol
         },
-        process.env.JWT_SECRET || "732ac7f71614373114b24f6412a69e1e466e6bb82002c48e95ff93e39dbb4c3b",
-        { expiresIn: "24h" }
+        process.env.JWT_SECRET ,
+        { expiresIn: "365d" }
       );
 
       res.json({ 
@@ -64,7 +64,7 @@ router.get("/verify", (req, res) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "732ac7f71614373114b24f6412a69e1e466e6bb82002c48e95ff93e39dbb4c3b");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     res.json({
       valid: true,
       usuario: decoded

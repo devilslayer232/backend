@@ -9,7 +9,7 @@ const verificarToken = (req, res, next) => {
 
   try {
     // Usamos JWT_SECRET con fallback para compatibilidad
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "732ac7f71614373114b24f6412a69e1e466e6bb82002c48e95ff93e39dbb4c3b");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET );
     req.usuario = decoded;
     next();
   } catch (error) {
