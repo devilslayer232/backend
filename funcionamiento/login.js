@@ -38,7 +38,7 @@ router.post("/", (req, res) => {
           email: usuario.email,
           rol: usuario.rol
         },
-        process.env.JWT_SECRET,
+        process.env.JWT_SECRET || "732ac7f71614373114b24f6412a69e1e466e6bb82002c48e95ff93e39dbb4c3b",
         { expiresIn: "24h" }
       );
 
@@ -64,10 +64,10 @@ router.get("/verify", (req, res) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "mi_secreto_super_seguro");
-    res.json({ 
-      valid: true, 
-      usuario: decoded 
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "732ac7f71614373114b24f6412a69e1e466e6bb82002c48e95ff93e39dbb4c3b");
+    res.json({
+      valid: true,
+      usuario: decoded
     });
   } catch (error) {
     res.status(401).json({ error: "Token inválido" });

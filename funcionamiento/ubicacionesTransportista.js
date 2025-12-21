@@ -107,7 +107,7 @@ router.get("/asignados", async (req, res) => {
     }
 
     const jwt = require("jsonwebtoken");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "732ac7f71614373114b24f6412a69e1e466e6bb82002c48e95ff93e39dbb4c3b");
     const usuario = decoded;
 
     let transportistaIds = [];
