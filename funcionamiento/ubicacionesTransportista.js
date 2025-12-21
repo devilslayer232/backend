@@ -107,12 +107,12 @@ router.get("/asignados", async (req, res) => {
     }
 
     const jwt = require("jsonwebtoken");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "mi_secreto_super_seguro");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const usuario = decoded;
 
     let transportistaIds = [];
 
-    if (usuario.rol === 'admin') {
+    if (usuario.rol === 'administrador' || usuario.rol === 'admin') {
       // Admin ve todas las ubicaciones recientes
       const sql = `
         SELECT DISTINCT ut.transportista_id
@@ -131,6 +131,9 @@ router.get("/asignados", async (req, res) => {
       `;
       const transportistas = await ejecutarQuery(sql, [usuario.id]);
       transportistaIds = transportistas.map(t => t.transportista_id).filter(id => id !== null);
+    } else if (usuario.rol === 'transportista') {
+      // Transportista ve su propia ubicación
+      transportistaIds = [usuario.id];
     } else {
       return res.status(403).json({ error: "Rol no autorizado para ver ubicaciones" });
     }

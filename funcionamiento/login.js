@@ -33,12 +33,12 @@ router.post("/", (req, res) => {
 
       // Crear token JWT
       const token = jwt.sign(
-        { 
-          id: usuario.id, 
-          email: usuario.email, 
-          rol: usuario.rol 
+        {
+          id: usuario.id,
+          email: usuario.email,
+          rol: usuario.rol
         },
-        process.env.JWT_SECRET || "mi_secreto_super_seguro",
+        process.env.JWT_SECRET,
         { expiresIn: "24h" }
       );
 
