@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "sync": "node -e \"require('./utils/syncComponents').sincronizarComponentes()\""
+    "sync": "node -e \"require('./utils/syncComponents').sincronizarComponentes()\"",
+    "postinstall": "npm install --include=optional sharp"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
