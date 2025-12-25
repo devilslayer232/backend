@@ -29,6 +29,7 @@ app.use((req, res, next) => {
 });
 
 // Middlewares
+app.use(cookieParser());
 app.use(express.json({ limit: '50mb' }));
 
 
