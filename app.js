@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const clientes_router = require('./funcionamiento/clientecomponentes');
 const clientes = require('./funcionamiento/clientes');
 const registroFacialRouter = require('./funcionamiento/RegistroFacial');

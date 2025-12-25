@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const { db } = require("../config/database");
 
 // Login: busca usuario por email y password
-router.post("/", (req, res) => {
+router.post("/", loginLimiter, (req, res) => {
   const { email, password } = req.body;
   
   if (!email || !password) {
@@ -55,10 +55,10 @@ router.post("/", (req, res) => {
   );
 });
 
-// Verificar token
+// Verificar token desde cookie
 router.get("/verify", (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  
+  const token = req.cookies.authToken;
+
   if (!token) {
     return res.status(401).json({ error: "Token no proporcionado" });
   }
