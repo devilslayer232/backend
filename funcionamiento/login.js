@@ -1,7 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
+const rateLimit = require('express-rate-limit');
 const { db } = require("../config/database");
+
+// Rate limiter for login attempts
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+  message: 'Too many login attempts from this IP, please try again later.'
+});
 
 // Login: busca usuario por email y password
 router.post("/", loginLimiter, (req, res) => {
