@@ -63,9 +63,10 @@ router.post("/", loginLimiter, (req, res) => {
   );
 });
 
-// Verificar token desde cookie
+// Verificar token desde Authorization header
 router.get("/verify", (req, res) => {
-  const token = req.cookies.authToken;
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
 
   if (!token) {
     return res.status(401).json({ error: "Token no proporcionado" });
